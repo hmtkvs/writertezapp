@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  # API service
+  api:
+    build:
+      context: ./thesis-search-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./readTexThesis:/app/readTexThesis
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_ENV=development
+    restart: unless-stopped
+
+  # Frontend service
+  frontend:
+    build:
+      context: ./thesis-search-navigator
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - api
+    restart: unless-stopped 

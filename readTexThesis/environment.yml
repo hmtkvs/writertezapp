@@ -1,0 +1,21 @@
+name: thesis
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pandas
+  - numpy
+  - pip
+  - pip:
+    - pdfplumber  # for PDF processing if needed later 
+    - qdrant-client==1.3.1
+    - openai==1.0.0
+    - fastapi==0.103.2
+    - pydantic==1.10.21  # Compatible with both FastAPI and qdrant-client
+    - uvicorn[standard]
+    - python-multipart
+    - httpx==0.23.3
+    - typing-extensions==4.5.0
+    - urllib3==1.26.20
+    - anyio==3.7.1

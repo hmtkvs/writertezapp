@@ -1,0 +1,5 @@
+archive/
+qdrant_storage2/
+*.pyc
+__pycache__/
+.ipynb_checkpoints/ 
