@@ -76,12 +76,133 @@ The parser component converts LaTeX (.tex) files from an Overleaf project into s
 
 This component serves as the backend for the Thesis Search Navigator application, providing endpoints for searching through LaTeX thesis content.
 
+#### API Configuration
+- Default API URL: `http://localhost:8000`
+- The frontend allows users to configure this URL through the API Settings dialog
+
 #### API Endpoints
-- `GET /` - Health check
-- `GET /chapters` - List of available chapters and sources
-- `GET /stats` - Document statistics
-- `POST /search` - Search functionality
-- `POST /rewrite-text` - Text rewriting functionality
+
+##### Health Check
+- **URL**: `/`
+- **Method**: GET
+- **Response**: 
+```json
+{
+  "message": "Welcome to Research Papers API"
+}
+```
+- **Purpose**: Confirms API is running and available
+
+##### Chapters
+- **URL**: `/chapters`
+- **Method**: GET
+- **Response**:
+```json
+{
+  "chapters": ["Introduction", "Literature Review", "Methodology", "Results", "Discussion", "Conclusion"],
+  "sources": ["chapter1.tex", "chapter2.tex", "chapter3.tex", "chapter4.tex", "chapter5.tex", "chapter6.tex"]
+}
+```
+- **Purpose**: Provides list of available chapters and source files for navigation and filtering
+
+##### Statistics
+- **URL**: `/stats`
+- **Method**: GET
+- **Response**:
+```json
+{
+  "documentCount": 6,
+  "chapterCount": 6,
+  "sectionCount": 30
+}
+```
+- **Purpose**: Provides metadata about the thesis document structure
+
+##### Search
+- **URL**: `/search`
+- **Method**: POST
+- **Request Body**:
+```json
+{
+  "query": "machine learning applications",
+  "limit": 5,
+  "score_threshold": 0.5,
+  "chapter_filter": "Literature Review",
+  "source_filter": null
+}
+```
+- **Parameters**:
+  - `query` (string): The search query text
+  - `limit` (number): Maximum number of results to return
+  - `score_threshold` (number): Minimum similarity score (0-1) for results
+  - `chapter_filter` (string|null): Filter results by chapter name
+  - `source_filter` (string|null): Filter results by source file
+
+- **Response**:
+```json
+{
+  "results": [
+    {
+      "id": "section-2.3",
+      "score": 0.87,
+      "title": "Deep Learning",
+      "content": "Deep learning represents a subset of machine learning...",
+      "metadata": {
+        "title": "Deep Learning",
+        "source": "chapter2.tex",
+        "parent_titles": ["Literature Review", "Machine Learning Approaches"],
+        "level": 2
+      }
+    }
+  ]
+}
+```
+
+##### Text Rewriting
+- **URL**: `/rewrite-text`
+- **Method**: POST
+- **Request Body**:
+```json
+{
+  "selectedText": "The text that was selected by the user",
+  "beforeText": "Text appearing before the selection for context",
+  "afterText": "Text appearing after the selection for context",
+  "userInput": "User's instructions for rewriting (e.g., 'Make this more formal')"
+}
+```
+- **Response**:
+```json
+{
+  "rewrittenText": "The rewritten version of the selected text"
+}
+```
+- **Purpose**: Processes text rewriting requests with user instructions
+
+#### Implementation Guidelines
+
+##### CORS Configuration
+Enable CORS to allow requests from the frontend domain:
+```python
+from flask import Flask
+from flask_cors import CORS
+
+app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
+```
+
+##### Error Handling
+Implement proper error responses:
+```json
+{
+  "detail": "Error message explaining what went wrong"
+}
+```
+
+##### Security Considerations
+1. Enable HTTPS for production deployments
+2. Implement rate limiting to prevent abuse
+3. Validate all user input
+4. Consider authentication for sensitive operations
 
 ### 3. thesis-search-navigator - Frontend Application
 
@@ -102,6 +223,15 @@ The frontend application provides a user interface for searching and navigating 
 4. Use the search functionality to find relevant sections
 5. Navigate through chapters and sections
 6. Utilize text rewriting features for editing
+
+## Integration Testing
+
+1. Start the backend API server: `./run_backend_api.sh`
+2. Start the frontend application and configure API URL
+3. Verify all functionality:
+   - Check that chapters load on the main page
+   - Test search functionality with different queries and filters
+   - Test text rewriting feature
 
 ## Dependencies
 
